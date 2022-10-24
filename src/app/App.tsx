@@ -9,7 +9,7 @@ import {
   generateAssetTransferTxns,
   generateOptIntoAssetTxns,
   generatePaymentTxns,
-  generateAppAssetTransferTxns
+  generateLoanPaymentTxns
 } from "./utils/txnUtils";
 import {truncateAccountAddress} from "./utils/stringUtils";
 import algod from "./utils/algod";
@@ -188,7 +188,7 @@ function App() {
   async function handleAppAssetTransferTransaction() {
     setIsRequestPending(true);
 
-    const txGroups = await generateAppAssetTransferTxns({
+    const txGroups = await generateLoanPaymentTxns({
       initiatorAddr: accountAddress!,
       contract_id: 117114757
     });
