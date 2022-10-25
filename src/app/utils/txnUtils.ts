@@ -52,15 +52,15 @@ async function generateAssetTransferTxns({
 }) {
   const suggestedParams = await algod.getTransactionParams().do();
 
-  const txn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
+  const asatxn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
     from: initiatorAddr,
     to,
     assetIndex: assetID,
-    amount: 55000000,
+    amount: 35000000,
     suggestedParams
   });
 
-  return [{txn, signers: [initiatorAddr]}];
+  return [{txn: asatxn, signers: [initiatorAddr]}];
 }
 
 async function generateLoanPaymentTxns({
@@ -82,8 +82,8 @@ async function generateLoanPaymentTxns({
   args.push(new Uint8Array(Buffer.from(op)));
   const params = await algod.getTransactionParams().do();
 
-  const txn = algosdk.makeApplicationNoOpTxn(
-    "F5TQCJVRAGQKYXKIGRLAP7NDWPPULK5FUT6TTUAFZBQAOK4WWHIHEWR6IU",
+  const apptxn = algosdk.makeApplicationNoOpTxn(
+    initiatorAddr,
     params,
     contract_id,
     args,
@@ -94,7 +94,7 @@ async function generateLoanPaymentTxns({
     undefined
   );
 
-  return [{txn, signers: [initiatorAddr]}];
+  return [{txn: apptxn, signers: [initiatorAddr]}];
 }
 
 export {
