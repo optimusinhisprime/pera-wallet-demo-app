@@ -3,7 +3,7 @@ import "./_app.scss";
 import {Button} from "@hipo/react-ui-toolkit";
 import {useEffect, useState} from "react";
 import {PeraWalletConnect} from "@perawallet/connect";
-// import algosdk from "algosdk";
+import algosdk from "algosdk";
 
 import {
   generateAssetTransferTxns,
@@ -214,35 +214,33 @@ function App() {
     setIsRequestPending(true);
 
     const transferTxGroups = await generateAssetTransferTxns({
-      to: "HAIHBGEARSHQP6JCS345WXE2GYPAONRKE4QMHOQAUKUZSX4ILIZMYZ7OQU",
+      to: "OJ2N6YYKVHOHNNHSDTWCR2F7A3QBTI26VGXWR52AJNMC5RU4YNLUFXXIFQ",
       assetID: 10458941,
       initiatorAddr: accountAddress!
     });
 
     const loanPaymentTxGroups = await generateLoanPaymentTxns({
       initiatorAddr: accountAddress!,
-      contract_id: 118089080
+      contract_id: 118364747
     });
 
     // assign group id to transactions
-    // algosdk.assignGroupID([transferTxGroups[0].txn, loanPaymentTxGroups[0].txn]);
+    algosdk.assignGroupID([transferTxGroups[0].txn, loanPaymentTxGroups[0].txn]);
 
     handleSetLog("Transfer txns generated: Launch Pera Wallet to sign them");
 
     try {
-      const signedTxnGroups = await peraWallet.signTransaction([
-        transferTxGroups,
-        loanPaymentTxGroups
-      ]);
-
-      console.log(signedTxnGroups);
+      const signedTxnGroups = await peraWallet.signTransaction(
+        [transferTxGroups, loanPaymentTxGroups],
+        loanPaymentTxGroups[0].signers[0]
+      );
 
       // Sign every txn in the group
-      for (const signedTxnGroup of signedTxnGroups) {
-        const {txId} = await algod.sendRawTransaction(signedTxnGroup).do();
+      // for (const signedTxnGroup of signedTxnGroups) {
+      const {txId} = await algod.sendRawTransaction(signedTxnGroups).do();
 
-        handleSetLog(`txns signed successfully! - txID: ${txId}`);
-      }
+      handleSetLog(`txns signed successfully! - txID: ${txId}`);
+      // }
     } catch (error) {
       handleSetLog(`${error}`);
       console.log(error);
